@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}BTS — Búsqueda: {{ query }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="section-title mb-1">Resultados para: <span class="text-purple">"{{ query }}"</span></h2>
+    <p class="text-muted mb-5">{{ total }} resultado(s) encontrado(s)</p>
+
+    {% if integrantes %}
+    <h4 class="text-purple mb-3"><i class="fa-solid fa-users me-2"></i>Integrantes</h4>
+    <div class="row g-3 mb-5">
+        {% for i in integrantes %}
+        <div class="col-sm-6 col-md-4">
+            <div class="bts-card p-3 d-flex align-items-center gap-3">
+                {% if i.imagen_url %}
+                <img src="{{ i.imagen_url }}" class="ranking-img" alt="{{ i.nombre }}">
+                {% else %}
+                <div class="ranking-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                {% endif %}
+                <div>
+                    <div class="fw-bold text-white">{{ i.nombre }}</div>
+                    <div class="text-purple small">{{ i.rol }}</div>
+                    <div class="text-muted" style="font-size:0.75rem">{{ i.edad }} años · {{ i.altura }}m</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if albumes %}
+    <h4 class="text-purple mb-3"><i class="fa-solid fa-record-vinyl me-2"></i>Álbumes</h4>
+    <div class="row g-3 mb-5">
+        {% for a in albumes %}
+        <div class="col-sm-6 col-md-4">
+            <div class="bts-card p-3">
+                <div class="fw-bold text-white">{{ a.nombre }}</div>
+                <div class="text-muted small">{{ a.anio }} · {{ a.num_canciones }} canciones</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if tours %}
+    <h4 class="text-purple mb-3"><i class="fa-solid fa-map-location-dot me-2"></i>Tours</h4>
+    <div class="row g-3 mb-5">
+        {% for t in tours %}
+        <div class="col-sm-6 col-md-4">
+            <div class="bts-card p-3">
+                <div class="fw-bold text-white">{{ t.nombre }}</div>
+                <div class="text-muted small">{{ t.anio }} · {{ t.ciudades_visitadas[:60] }}...</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if not integrantes and not albumes and not tours %}
+    <div class="empty-state text-center py-5">
+        <i class="fa-solid fa-magnifying-glass fa-4x text-purple mb-3 opacity-50"></i>
+        <h4 class="text-muted">Sin resultados para "{{ query }}"</h4>
+        <p class="text-muted">Intenta con otro término de búsqueda</p>
+        <a href="/" class="btn btn-purple mt-2">Ir al inicio</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}BTS — Dashboard de Popularidad{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="section-badge">ARMY Votes</span>
+        <h2 class="section-title">Dashboard de <span class="text-purple">Popularidad</span></h2>
+        <p class="text-muted-light">Votos de los fans · Actualizado en tiempo real</p>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-number text-purple">{{ total_votos }}</div>
+                <div class="stat-label">Total votos</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-number text-purple">7</div>
+                <div class="stat-label">Integrantes</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-number text-purple">{{ total_albumes }}</div>
+                <div class="stat-label">Álbumes</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card text-center">
+                <div class="stat-number text-purple">{{ stats[0].nombre_integrante if stats else '—' }}</div>
+                <div class="stat-label">Más popular</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <!-- GRÁFICAS -->
+        <div class="col-lg-8">
+            <!-- Gráfica de barras -->
+            <div class="bts-card p-4 mb-4">
+                <h5 class="text-purple mb-3"><i class="fa-solid fa-chart-bar me-2"></i>Votos por integrante</h5>
+                <canvas id="chartBarras" height="100"></canvas>
+            </div>
+            <!-- Gráfica de dona -->
+            <div class="bts-card p-4">
+                <h5 class="text-purple mb-3"><i class="fa-solid fa-chart-pie me-2"></i>Distribución de votos</h5>
+                <div style="max-width:400px; margin:0 auto">
+                    <canvas id="chartDona"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL LATERAL RANKING + FORMULARIO -->
+        <div class="col-lg-4">
+            <!-- Ranking -->
+            <div class="bts-card p-4 mb-4">
+                <h5 class="text-purple mb-3"><i class="fa-solid fa-ranking-star me-2"></i>Ranking ARMY</h5>
+                {% for s in stats %}
+                <div class="ranking-row mb-3">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="ranking-num me-2">{{ loop.index }}</span>
+                        {% if s.imagen_url %}
+                        <img src="{{ s.imagen_url }}" class="ranking-img me-2" alt="{{ s.nombre_integrante }}">
+                        {% else %}
+                        <div class="ranking-img-placeholder me-2"><i class="fa-solid fa-user"></i></div>
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="fw-bold text-white small">{{ s.nombre_integrante }}</div>
+                            <div class="text-muted" style="font-size:0.75rem">{{ s.total_votos }} votos · {{ s.porcentaje }}%</div>
+                        </div>
+                    </div>
+                    <div class="progress" style="height:4px">
+                        <div class="progress-bar bg-purple" style="width:{{ s.porcentaje }}%"></div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted small">Aún no hay votos. ¡Sé el primero!</p>
+                {% endfor %}
+            </div>
+
+            <!-- FORMULARIO DE VOTO -->
+            <div class="bts-card p-4">
+                <h5 class="text-purple mb-3"><i class="fa-solid fa-heart me-2"></i>¿Cuál es tu favorito?</h5>
+                <form action="/form/votar" method="post" id="formVoto">
+                    <div class="mb-3">
+                        <label class="form-label">Tu nombre de ARMY <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_fan" class="form-control bts-input"
+                               required minlength="2" maxlength="64" placeholder="Ej: ARMY_Colombia">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Integrante favorito <span class="text-danger">*</span></label>
+                        <select name="integrante_id" class="form-select bts-input" required>
+                            <option value="">-- Elige tu bias --</option>
+                            {% for i in integrantes %}
+                            <option value="{{ i.id }}">{{ i.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">¿Por qué es tu favorito?</label>
+                        <textarea name="comentario" class="form-control bts-input" rows="3"
+                                  maxlength="300" placeholder="Comparte tu amor por BTS..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-purple w-100">
+                        <i class="fa-solid fa-heart me-2"></i>¡Votar!
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- VOTOS RECIENTES -->
+    {% if votos_recientes %}
+    <div class="bts-card p-4 mt-5">
+        <h5 class="text-purple mb-3"><i class="fa-solid fa-clock-rotate-left me-2"></i>Votos recientes</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover bts-table">
+                <thead>
+                    <tr>
+                        <th>ARMY</th>
+                        <th>Integrante favorito</th>
+                        <th>Comentario</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in votos_recientes %}
+                    <tr>
+                        <td class="text-purple fw-bold">{{ v.nombre_fan }}</td>
+                        <td>{{ nombres_integrantes.get(v.integrante_id, '—') }}</td>
+                        <td class="text-muted">{{ v.comentario or '—' }}</td>
+                        <td class="text-muted small">{{ v.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Datos para las gráficas desde el servidor (Jinja2 JavaScript)
+const labels  = {{ nombres_chart | tojson }};
+const votos   = {{ votos_chart   | tojson }};
+const colores = [
+    '#7c3aed','#a855f7','#c084fc','#e9d5ff',
+    '#f59e0b','#fbbf24','#3b82f6'
+];
+
+// Gráfica de barras
+new Chart(document.getElementById('chartBarras'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{
+            label: 'Votos',
+            data: votos,
+            backgroundColor: colores,
+            borderRadius: 8,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(124,58,237,0.15)' } },
+            x: { ticks: { color: '#e2e8f0' }, grid: { display: false } }
+        }
+    }
+});
+
+// Gráfica de dona
+new Chart(document.getElementById('chartDona'), {
+    type: 'doughnut',
+    data: {
+        labels,
+        datasets: [{
+            data: votos,
+            backgroundColor: colores,
+            borderColor: '#0f0a1e',
+            borderWidth: 3,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 15 } }
+        }
+    }
+});
+
+// Validación del formulario de voto
+document.getElementById('formVoto').addEventListener('submit', function(e) {
+    if (!this.checkValidity()) {
+        e.preventDefault();
+        this.querySelectorAll(':invalid').forEach(el => el.classList.add('is-invalid'));
+    }
+});
+</script>
+{% endblock %}

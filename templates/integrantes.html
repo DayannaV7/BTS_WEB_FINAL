@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+{% block title %}BTS — Integrantes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <span class="section-badge">방탄소년단</span>
+            <h2 class="section-title mb-0">Los <span class="text-purple">7</span> Integrantes</h2>
+        </div>
+        <button class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#modalNuevo">
+            <i class="fa-solid fa-plus me-2"></i>Agregar integrante
+        </button>
+    </div>
+
+    <!-- BUSCADOR LOCAL -->
+    <div class="mb-4">
+        <input type="text" id="buscadorLocal" class="form-control bts-search"
+               placeholder="Filtrar por nombre o rol..." oninput="filtrarCards()">
+    </div>
+
+    <!-- CARDS -->
+    {% if integrantes %}
+    <div class="row g-4" id="contenedorCards">
+        {% for i in integrantes %}
+        <div class="col-sm-6 col-lg-4 card-item" data-nombre="{{ i.nombre | lower }}" data-rol="{{ i.rol | lower }}">
+            <div class="bts-card h-100">
+                <!-- Imagen -->
+                <div class="card-img-wrapper">
+                    {% if i.imagen_url %}
+                    <img src="{{ i.imagen_url }}" alt="{{ i.nombre }}" class="card-member-img">
+                    {% else %}
+                    <div class="card-img-placeholder">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    {% endif %}
+                    <span class="card-estado badge bg-{% if i.estado == 'activo' %}success{% else %}secondary{% endif %}">
+                        {{ i.estado }}
+                    </span>
+                </div>
+
+                <!-- Info -->
+                <div class="card-body-bts">
+                    <h5 class="card-name">{{ i.nombre }}</h5>
+                    <span class="card-rol">{{ i.rol }}</span>
+                    <div class="card-details mt-2">
+                        <span><i class="fa-solid fa-cake-candles me-1 text-purple"></i>{{ i.edad }} años</span>
+                        <span><i class="fa-solid fa-ruler-vertical me-1 text-purple"></i>{{ i.altura }}m</span>
+                    </div>
+                    {% if i.descripcion %}
+                    <p class="card-desc mt-2">{{ i.descripcion[:100] }}{% if i.descripcion|length > 100 %}...{% endif %}</p>
+                    {% endif %}
+
+                    <!-- Botones CRUD -->
+                    <div class="card-actions mt-3">
+                        <!-- Subir imagen -->
+                        <button class="btn btn-sm btn-outline-purple"
+                                onclick="abrirModalImagen({{ i.id }}, '{{ i.nombre }}')"
+                                title="Cambiar foto">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                        <!-- Editar -->
+                        <button class="btn btn-sm btn-outline-gold"
+                                onclick="abrirModalEditar({{ i.id }}, '{{ i.nombre }}', {{ i.edad }}, {{ i.altura }}, '{{ i.rol }}', '{{ i.descripcion or '' }}')"
+                                title="Editar">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <!-- Desactivar (soft delete) -->
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="confirmarDesactivar({{ i.id }}, '{{ i.nombre }}')"
+                                title="Desactivar">
+                            <i class="fa-solid fa-user-slash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state text-center py-5">
+        <i class="fa-solid fa-users-slash fa-4x text-purple mb-3 opacity-50"></i>
+        <h4 class="text-muted">No hay integrantes registrados aún</h4>
+        <p class="text-muted">Haz clic en "Agregar integrante" para comenzar</p>
+    </div>
+    {% endif %}
+</div>
+
+<!--NUEVO INTEGRANTE-->
+<div class="modal fade" id="modalNuevo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-user-plus me-2 text-purple"></i>Nuevo integrante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/form/integrantes" method="post" enctype="multipart/form-data" id="formNuevo">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre" class="form-control bts-input"
+                               required minlength="2" maxlength="64" placeholder="Ej: Kim Namjoon (RM)">
+                        <div class="invalid-feedback">Mínimo 2 caracteres</div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">Edad <span class="text-danger">*</span></label>
+                            <input type="number" name="edad" class="form-control bts-input"
+                                   required min="1" max="119" placeholder="Ej: 30">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Altura (m) <span class="text-danger">*</span></label>
+                            <input type="number" name="altura" class="form-control bts-input"
+                                   required min="0.5" max="2.9" step="0.01" placeholder="Ej: 1.81">
+                        </div>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Rol <span class="text-danger">*</span></label>
+                        <input type="text" name="rol" class="form-control bts-input"
+                               required minlength="2" maxlength="128" placeholder="Ej: Líder / Rapper Principal">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="descripcion" class="form-control bts-input" rows="3"
+                                  maxlength="500" placeholder="Breve descripción del integrante..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Foto del integrante</label>
+                        <input type="file" name="imagen" class="form-control bts-input"
+                               accept="image/jpeg,image/png,image/webp">
+                        <div class="form-text text-muted">JPG, PNG o WEBP · Máx 5MB</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-purple">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--EDITAR INTEGRANTE-->
+<div class="modal fade" id="modalEditar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2 text-gold"></i>Editar integrante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" id="edit-nombre" class="form-control bts-input" minlength="2" maxlength="64">
+                </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Edad</label>
+                        <input type="number" id="edit-edad" class="form-control bts-input" min="1" max="119">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Altura (m)</label>
+                        <input type="number" id="edit-altura" class="form-control bts-input" min="0.5" max="2.9" step="0.01">
+                    </div>
+                </div>
+                <div class="mt-3 mb-3">
+                    <label class="form-label">Rol</label>
+                    <input type="text" id="edit-rol" class="form-control bts-input" minlength="2" maxlength="128">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descripción</label>
+                    <textarea id="edit-descripcion" class="form-control bts-input" rows="3" maxlength="500"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold" onclick="guardarEdicion()">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--SUBIR IMAGEN-->
+<div class="modal fade" id="modalImagen" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-camera me-2 text-purple"></i>Subir foto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formImagen" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Foto para: <strong id="nombreImagen" class="text-purple"></strong></p>
+                    <input type="file" id="archivoImagen" name="imagen" class="form-control bts-input"
+                           accept="image/jpeg,image/png,image/webp" required>
+                    <div class="form-text text-muted">JPG, PNG o WEBP · Máx 5MB</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-purple" onclick="subirImagen()">
+                        <i class="fa-solid fa-upload me-2"></i>Subir
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--CONFIRMAR DESACTIVAR-->
+<div class="modal fade" id="modalConfirmar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Desactivar a <strong id="nombreConfirmar" class="text-purple"></strong>?</p>
+                <p class="text-muted small">El registro quedará en el historial con estado inactivo.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="ejecutarDesactivar()">
+                    <i class="fa-solid fa-user-slash me-2"></i>Desactivar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let idActual = null;
+
+function filtrarCards() {
+    const q = document.getElementById('buscadorLocal').value.toLowerCase();
+    document.querySelectorAll('.card-item').forEach(card => {
+        const nombre = card.dataset.nombre;
+        const rol    = card.dataset.rol;
+        card.style.display = (nombre.includes(q) || rol.includes(q)) ? '' : 'none';
+    });
+}
+
+function abrirModalEditar(id, nombre, edad, altura, rol, desc) {
+    idActual = id;
+    document.getElementById('edit-nombre').value      = nombre;
+    document.getElementById('edit-edad').value        = edad;
+    document.getElementById('edit-altura').value      = altura;
+    document.getElementById('edit-rol').value         = rol;
+    document.getElementById('edit-descripcion').value = desc;
+    new bootstrap.Modal(document.getElementById('modalEditar')).show();
+}
+
+async function guardarEdicion() {
+    const payload = {
+        nombre:      document.getElementById('edit-nombre').value,
+        edad:        parseInt(document.getElementById('edit-edad').value),
+        altura:      parseFloat(document.getElementById('edit-altura').value),
+        rol:         document.getElementById('edit-rol').value,
+        descripcion: document.getElementById('edit-descripcion').value || null
+    };
+    try {
+        const r = await fetch(`/api/integrantes/${idActual}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        if (r.ok) { location.reload(); }
+        else {
+            const err = await r.json();
+            alert('Error: ' + (err.detail || 'No se pudo actualizar'));
+        }
+    } catch(e) { alert('Error de conexión'); }
+}
+
+function abrirModalImagen(id, nombre) {
+    idActual = id;
+    document.getElementById('nombreImagen').textContent = nombre;
+    new bootstrap.Modal(document.getElementById('modalImagen')).show();
+}
+
+async function subirImagen() {
+    const archivo = document.getElementById('archivoImagen').files[0];
+    if (!archivo) { alert('Selecciona una imagen'); return; }
+    const fd = new FormData();
+    fd.append('imagen', archivo);
+    try {
+        const r = await fetch(`/api/integrantes/${idActual}/imagen`, { method: 'POST', body: fd });
+        if (r.ok) { location.reload(); }
+        else {
+            const err = await r.json();
+            alert('Error: ' + (err.detail || 'No se pudo subir la imagen'));
+        }
+    } catch(e) { alert('Error de conexión'); }
+}
+
+function confirmarDesactivar(id, nombre) {
+    idActual = id;
+    document.getElementById('nombreConfirmar').textContent = nombre;
+    new bootstrap.Modal(document.getElementById('modalConfirmar')).show();
+}
+
+async function ejecutarDesactivar() {
+    try {
+        const r = await fetch(`/api/integrantes/${idActual}`, { method: 'DELETE' });
+        if (r.ok) { location.reload(); }
+        else { alert('No se pudo desactivar el integrante'); }
+    } catch(e) { alert('Error de conexión'); }
+}
+
+// Validación HTML5 del formulario
+document.getElementById('formNuevo').addEventListener('submit', function(e) {
+    if (!this.checkValidity()) {
+        e.preventDefault();
+        this.querySelectorAll(':invalid').forEach(el => el.classList.add('is-invalid'));
+    }
+});
+</script>
+{% endblock %}

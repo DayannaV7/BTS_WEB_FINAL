@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}BTS — Tours{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <span class="section-badge">Conciertos</span>
+            <h2 class="section-title mb-0">Tours de <span class="text-purple">BTS</span></h2>
+        </div>
+        <button class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#modalNuevoTour">
+            <i class="fa-solid fa-plus me-2"></i>Agregar tour
+        </button>
+    </div>
+
+    {% if tours %}
+    <div class="row g-4">
+        {% for t in tours %}
+        <div class="col-md-6 col-lg-4">
+            <div class="bts-card h-100 tour-card">
+                <div class="tour-header">
+                    <i class="fa-solid fa-map-location-dot fa-2x text-purple"></i>
+                    <span class="badge bg-purple ms-2">{{ t.anio }}</span>
+                </div>
+                <div class="card-body-bts">
+                    <h5 class="card-name">{{ t.nombre }}</h5>
+                    <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot me-1 text-purple"></i>{{ t.ciudades_visitadas }}</p>
+                    <p class="text-muted small"><i class="fa-solid fa-record-vinyl me-1 text-purple"></i>Álbum ID: {{ t.album_id }}</p>
+                    <div class="card-actions mt-3">
+                        <button class="btn btn-sm btn-outline-gold" onclick="editarTour({{ t.id }}, '{{ t.nombre }}', '{{ t.ciudades_visitadas }}', {{ t.anio }})" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="cancelarTour({{ t.id }}, '{{ t.nombre }}')" title="Cancelar"><i class="fa-solid fa-ban"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state text-center py-5">
+        <i class="fa-solid fa-map-location-dot fa-4x text-purple mb-3 opacity-50"></i>
+        <h4 class="text-muted">No hay tours registrados</h4>
+    </div>
+    {% endif %}
+</div>
+
+<!--NUEVO TOUR -->
+<div class="modal fade" id="modalNuevoTour" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-map-location-dot me-2 text-purple"></i>Nuevo tour</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/form/tours" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre" class="form-control bts-input" required placeholder="Ej: Love Yourself World Tour">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ciudades visitadas <span class="text-danger">*</span></label>
+                        <textarea name="ciudades_visitadas" class="form-control bts-input" required rows="2" placeholder="Ej: Seúl, Los Ángeles, Londres, París"></textarea>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Año <span class="text-danger">*</span></label>
+                            <input type="number" name="anio" class="form-control bts-input" required min="1991" max="2029" placeholder="2024">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Álbum asociado <span class="text-danger">*</span></label>
+                            <select name="album_id" class="form-select bts-input" required>
+                                <option value="">-- Seleccionar --</option>
+                                {% for a in albumes %}
+                                <option value="{{ a.id }}">{{ a.nombre }} ({{ a.anio }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-purple"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--EDITAR TOUR -->
+<div class="modal fade" id="modalEditarTour" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2 text-gold"></i>Editar tour</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label">Nombre</label><input type="text" id="et-nombre" class="form-control bts-input"></div>
+                <div class="mb-3"><label class="form-label">Ciudades</label><textarea id="et-ciudades" class="form-control bts-input" rows="2"></textarea></div>
+                <div class="mb-3"><label class="form-label">Año</label><input type="number" id="et-anio" class="form-control bts-input" min="1991" max="2029"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold" onclick="guardarTour()"><i class="fa-solid fa-floppy-disk me-2"></i>Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let idTour = null;
+function editarTour(id, nombre, ciudades, anio) {
+    idTour = id;
+    document.getElementById('et-nombre').value   = nombre;
+    document.getElementById('et-ciudades').value = ciudades;
+    document.getElementById('et-anio').value     = anio;
+    new bootstrap.Modal(document.getElementById('modalEditarTour')).show();
+}
+async function guardarTour() {
+    const r = await fetch(`/api/tours/${idTour}`, {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+            nombre: document.getElementById('et-nombre').value,
+            ciudades_visitadas: document.getElementById('et-ciudades').value,
+            anio: parseInt(document.getElementById('et-anio').value)
+        })
+    });
+    if (r.ok) location.reload(); else alert('Error al actualizar');
+}
+async function cancelarTour(id, nombre) {
+    if (!confirm(`¿Cancelar el tour "${nombre}"?`)) return;
+    const r = await fetch(`/api/tours/${id}`, { method: 'DELETE' });
+    if (r.ok) location.reload(); else alert('No se pudo cancelar');
+}
+</script>
+{% endblock %}
