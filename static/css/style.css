@@ -240,3 +240,8 @@ body {
 
 /*SELECT OSCURO*/
 select.bts-input option { background: #1a1230; color: #e2e8f0; }
+
+/*Colores especificados*/
+.bts-table td { color: #cbd5e1 !important; }
+.tour-card .text-muted { color: #a0aec0 !important; }
+.award-card p.text-muted { color: #a0aec0 !important; }
