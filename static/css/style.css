@@ -1,0 +1,242 @@
+/*BTS WORLD — Stylesheet
+ Tema: Púrpura oscuro, Gold y Blanco*/
+
+:root {
+    --bts-bg:      #0f0a1e;
+    --bts-card:    #1a1230;
+    --bts-card2:   #211847;
+    --bts-purple:  #7c3aed;
+    --bts-purple2: #a855f7;
+    --bts-gold:    #f59e0b;
+    --bts-text:    #e2e8f0;
+    --bts-muted:   #94a3b8;
+    --bts-border:  rgba(124,58,237,0.35);
+}
+
+/* ─── BASE ─── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bts-bg);
+    color: var(--bts-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─── NAVBAR ─── */
+.bts-navbar {
+    background: rgba(15,10,30,0.97) !important;
+    border-bottom: 1px solid var(--bts-border);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+}
+.bts-logo { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; text-decoration: none; }
+.logo-purple { color: var(--bts-purple2); }
+.logo-white  { color: #fff; }
+.nav-link { color: var(--bts-muted) !important; transition: color 0.2s; font-weight: 500; }
+.nav-link:hover, .nav-link.active { color: var(--bts-purple2) !important; }
+.bts-search {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid var(--bts-border);
+    color: var(--bts-text);
+    border-radius: 8px 0 0 8px;
+    min-width: 180px;
+}
+.bts-search:focus { background: rgba(124,58,237,0.2); border-color: var(--bts-purple); box-shadow: none; color: #fff; }
+.bts-search::placeholder { color: var(--bts-muted); }
+
+/* ─── BOTONES ─── */
+.btn-purple {
+    background: var(--bts-purple);
+    border-color: var(--bts-purple);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.btn-purple:hover { background: var(--bts-purple2); border-color: var(--bts-purple2); color: #fff; transform: translateY(-1px); }
+.btn-gold { background: var(--bts-gold); border-color: var(--bts-gold); color: #000; font-weight: 600; border-radius: 8px; }
+.btn-gold:hover { background: #fbbf24; color: #000; }
+.btn-outline-purple { border-color: var(--bts-purple); color: var(--bts-purple2); border-radius: 8px; }
+.btn-outline-purple:hover { background: var(--bts-purple); color: #fff; }
+.btn-outline-gold { border-color: var(--bts-gold); color: var(--bts-gold); border-radius: 8px; }
+.btn-outline-gold:hover { background: var(--bts-gold); color: #000; }
+.bg-purple { background: var(--bts-purple) !important; }
+.text-purple { color: var(--bts-purple2) !important; }
+.text-gold   { color: var(--bts-gold)    !important; }
+.text-muted-light { color: #a0aec0; line-height: 1.7; }
+
+/* ─── FLASH ALERT ─── */
+.bts-alert { border-radius: 0; border: none; font-weight: 500; }
+
+/* ─── MAIN ─── */
+.bts-main { flex: 1; }
+
+/* ─── HERO ─── */
+.hero-section {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #0a0618 0%, #1a0a2e 40%, #2d1468 70%, #0f0a1e 100%);
+    overflow: hidden;
+}
+.hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(124,58,237,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(168,85,247,0.15) 0%, transparent 50%);
+}
+.hero-overlay { position: absolute; inset: 0; }
+.hero-content { position: relative; z-index: 2; }
+.hero-sub    { font-size: 1.1rem; letter-spacing: 6px; color: var(--bts-purple2); font-weight: 600; text-transform: uppercase; }
+.hero-title  { font-size: clamp(2.5rem, 8vw, 5.5rem); font-weight: 800; letter-spacing: 4px; color: #fff; line-height: 1.1; margin: 0.5rem 0; }
+.hero-desc   { font-size: 1.15rem; color: #b4bcd0; max-width: 600px; margin: 1rem auto; }
+.animate-fade { animation: fadeUp 0.8s ease both; }
+@keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+/*SECTIONS*/
+.bts-section { background: var(--bts-bg); }
+.awards-section { background: linear-gradient(180deg, var(--bts-bg) 0%, #130d2a 100%); }
+.cta-section { background: linear-gradient(135deg, #1a0a2e, #2d1468); }
+.section-badge {
+    display: inline-block;
+    background: rgba(124,58,237,0.2);
+    color: var(--bts-purple2);
+    border: 1px solid var(--bts-border);
+    border-radius: 99px;
+    padding: 4px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
+.section-title { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; color: #fff; }
+
+/*STAT CARDS*/
+.stat-card {
+    background: var(--bts-card);
+    border: 1px solid var(--bts-border);
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-3px); }
+.stat-number { font-size: 1.8rem; font-weight: 800; color: var(--bts-purple2); }
+.stat-label  { font-size: 0.78rem; color: var(--bts-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/*VIDEO*/
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid var(--bts-border);
+    box-shadow: 0 0 40px rgba(124,58,237,0.3);
+}
+.video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/*AWARD CARDS*/
+.award-card {
+    background: var(--bts-card);
+    border: 1px solid var(--bts-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.25s;
+}
+.award-card:hover { transform: translateY(-4px); border-color: var(--bts-purple2); box-shadow: 0 8px 30px rgba(124,58,237,0.25); }
+.award-icon { font-size: 2rem; color: var(--bts-gold); margin-bottom: 0.75rem; }
+.award-card h5 { color: #fff; font-weight: 700; }
+
+/*BTS CARDS (MIEMBROS / ÁLBUMES)*/
+.bts-card {
+    background: var(--bts-card);
+    border: 1px solid var(--bts-border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.25s;
+}
+.bts-card:hover { transform: translateY(-5px); border-color: var(--bts-purple2); box-shadow: 0 12px 40px rgba(124,58,237,0.25); }
+.card-img-wrapper { position: relative; height: 220px; overflow: hidden; background: var(--bts-card2); }
+.card-member-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.bts-card:hover .card-member-img { transform: scale(1.05); }
+.card-img-placeholder { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: rgba(124,58,237,0.4); }
+.card-estado { position: absolute; top: 10px; right: 10px; font-size: 0.7rem; }
+.card-body-bts { padding: 1.25rem; }
+.card-name { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.25rem; }
+.card-rol  { font-size: 0.8rem; color: var(--bts-purple2); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.card-details { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--bts-muted); flex-wrap: wrap; }
+.card-desc { font-size: 0.85rem; color: var(--bts-muted); line-height: 1.5; }
+.card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/*TOUR CARD*/
+.tour-card .tour-header { padding: 1.25rem 1.25rem 0; }
+
+/*MODALES*/
+.bts-modal { background: #1a1230; border: 1px solid var(--bts-border); color: var(--bts-text); }
+.bts-modal .modal-header { border-bottom: 1px solid var(--bts-border); }
+.bts-modal .modal-footer { border-top: 1px solid var(--bts-border); }
+.bts-modal .modal-title  { color: #fff; font-weight: 700; }
+.bts-input {
+    background: rgba(124,58,237,0.08);
+    border: 1px solid var(--bts-border);
+    color: var(--bts-text);
+    border-radius: 8px;
+}
+.bts-input:focus { background: rgba(124,58,237,0.15); border-color: var(--bts-purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.2); color: #fff; }
+.bts-input::placeholder { color: var(--bts-muted); }
+.form-label { color: var(--bts-muted); font-size: 0.88rem; font-weight: 500; margin-bottom: 0.4rem; }
+
+/*DASHBOARD*/
+.ranking-row { padding-bottom: 0.5rem; border-bottom: 1px solid rgba(124,58,237,0.15); }
+.ranking-num {
+    width: 24px; height: 24px;
+    background: var(--bts-purple);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+}
+.ranking-img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bts-border); flex-shrink: 0; }
+.ranking-img-placeholder {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--bts-card2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bts-muted); font-size: 0.9rem;
+    flex-shrink: 0;
+}
+.progress { background: rgba(124,58,237,0.15); border-radius: 99px; }
+.progress-bar.bg-purple { background: var(--bts-purple) !important; border-radius: 99px; }
+.bts-table { --bs-table-bg: transparent; --bs-table-hover-bg: rgba(124,58,237,0.1); }
+.bts-table thead th { color: var(--bts-purple2); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--bts-border); }
+.bts-table td { border-color: rgba(124,58,237,0.1); font-size: 0.88rem; vertical-align: middle; }
+
+/*BUSCADOR LOCAL*/
+#buscadorLocal { background: rgba(124,58,237,0.08); border: 1px solid var(--bts-border); color: var(--bts-text); border-radius: 10px; padding: 0.75rem 1rem; }
+#buscadorLocal:focus { background: rgba(124,58,237,0.15); border-color: var(--bts-purple); box-shadow: none; color: #fff; }
+
+/*EMPTY STATE*/
+.empty-state { padding: 3rem 0; }
+
+/*FOOTER*/
+.bts-footer { background: #090614; border-top: 1px solid var(--bts-border); }
+.footer-link { color: var(--bts-muted); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+.footer-link:hover { color: var(--bts-purple2); }
+.footer-icon { color: var(--bts-muted); font-size: 1.2rem; transition: color 0.2s; text-decoration: none; }
+.footer-icon:hover { color: var(--bts-purple2); }
+.bts-hr { border-color: var(--bts-border); opacity: 1; }
+
+/*RESPONSIVE*/
+@media (max-width: 576px) {
+    .hero-title { font-size: 2.2rem; }
+    .card-img-wrapper { height: 180px; }
+}
+
+/*SELECT OSCURO*/
+select.bts-input option { background: #1a1230; color: #e2e8f0; }
