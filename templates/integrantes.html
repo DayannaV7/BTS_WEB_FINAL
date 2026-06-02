@@ -50,7 +50,7 @@
                         <span><i class="fa-solid fa-ruler-vertical me-1 text-purple"></i>{{ i.altura }}m</span>
                     </div>
                     {% if i.descripcion %}
-                    <p class="card-desc mt-2">{{ i.descripcion[:100] }}{% if i.descripcion|length > 100 %}...{% endif %}</p>
+                    <p class="card-desc mt-2">{{ i.descripcion }}</p>
                     {% endif %}
 
                     <!-- Botones CRUD -->
@@ -173,7 +173,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Descripción</label>
-                    <textarea id="edit-descripcion" class="form-control bts-input" rows="3" maxlength="500"></textarea>
+                    <textarea id="edit-descripcion" class="form-control bts-input" rows="3" maxlength="600"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
