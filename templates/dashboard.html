@@ -137,7 +137,7 @@
                         <td class="text-purple fw-bold">{{ v.nombre_fan }}</td>
                         <td>{{ nombres_integrantes.get(v.integrante_id, '—') }}</td>
                         <td class="text-muted">{{ v.comentario or '—' }}</td>
-                        <td class="text-muted small">{{ v.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td class="text-muted small">{{ (v.fecha + timedelta).strftime('%d/%m/%Y %H:%M') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

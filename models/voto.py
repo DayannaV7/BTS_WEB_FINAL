@@ -1,8 +1,9 @@
 from pydantic import BaseModel, ConfigDict
 from sqlmodel import SQLModel, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
+colombia = timezone(timedelta(hours=-5))
 
 class VotoBase(SQLModel):
     nombre_fan:    str = Field(min_length=2, max_length=64,
@@ -15,7 +16,7 @@ class VotoBase(SQLModel):
 
 class VotoFan(VotoBase, table=True):
     id:    int | None  = Field(default=None, primary_key=True)
-    fecha: datetime    = Field(default_factory=datetime.utcnow)
+    fecha: datetime = Field(default_factory=lambda: datetime.now(colombia))
 
 
 class VotoRead(BaseModel):

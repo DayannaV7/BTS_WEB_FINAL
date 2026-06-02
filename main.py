@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import Optional
-
+from datetime import timedelta
 from db import create_all_tables, SessionDep
 from utils import subir_imagen
 
@@ -112,6 +112,7 @@ def pagina_dashboard(request: Request, session: SessionDep,
         "votos_recientes":      recientes,
         "integrantes":          integrantes,
         "albumes":              albumes,
+        "timedelta": timedelta(hours=-5),
         "total_votos":          total_votos,
         "total_albumes":        len(albumes),
         "nombres_chart":        [s.nombre_integrante for s in stats],
