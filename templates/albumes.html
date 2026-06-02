@@ -30,7 +30,7 @@
                         <span><i class="fa-solid fa-calendar me-1 text-purple"></i>{{ a.anio }}</span>
                         <span><i class="fa-solid fa-music me-1 text-purple"></i>{{ a.num_canciones }} canciones</span>
                     </div>
-                    {% if a.descripcion %}<p class="card-desc mt-2">{{ a.descripcion[:100] }}...</p>{% endif %}
+                    {% if a.descripcion %}<p class="card-desc mt-2">{{ a.descripcion[:700] }}</p>{% endif %}<!--si se pone cualquier carácter antes de </p> se verá al final de la descripción-->
                     <div class="card-actions mt-3">
                         <button class="btn btn-sm btn-outline-purple" onclick="abrirImgAlbum({{ a.id }}, '{{ a.nombre }}')" title="Foto"><i class="fa-solid fa-camera"></i></button>
                         <button class="btn btn-sm btn-outline-gold" onclick="editarAlbum({{ a.id }}, '{{ a.nombre }}', {{ a.num_canciones }}, {{ a.anio }}, '{{ a.descripcion or '' }}')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
