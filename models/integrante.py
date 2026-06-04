@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class IntegranteBase(SQLModel):
-    nombre:      str   = Field(min_length=2, max_length=64)
+    nombre:      str   = Field(min_length=1, max_length=64)
     edad:        int   = Field(gt=0, lt=120)
     altura:      float = Field(gt=0.0, lt=3.0, description="En metros, ej: 1.81")
     rol:         str   = Field(min_length=2, max_length=128, description="Ej: Líder / Rapper Principal")
@@ -30,7 +30,7 @@ class IntegranteRead(BaseModel):
 
 
 class IntegranteUpdate(SQLModel):
-    nombre:      str | None   = Field(default=None, min_length=2, max_length=64)
+    nombre:      str | None   = Field(default=None, min_length=1, max_length=64)
     edad:        int | None   = Field(default=None, gt=0, lt=120)
     altura:      float | None = Field(default=None, gt=0.0, lt=3.0)
     rol:         str | None   = Field(default=None, min_length=2, max_length=128)
