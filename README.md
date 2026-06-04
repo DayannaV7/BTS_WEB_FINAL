@@ -56,19 +56,8 @@ BTS_WEB/
 
 ---
 
-##  Modelos y relaciones
-
-```
-Integrante (1) ──────────── (N) VotoFan
-   id, nombre, edad,              id, nombre_fan,
-   altura, rol,                   integrante_id (FK),
-   imagen_url, estado             comentario, fecha
-
-Album (1) ───────────────── (N) Tour
-   id, nombre, anio,              id, nombre,
-   num_canciones,                 ciudades_visitadas,
-   imagen_url, estado             anio, album_id (FK), estado
-```
+##  Diagramas 
+![alt text](Diagramas_BTS/Diagrama_Clases_BTS.pdf)
 
 ---
 
