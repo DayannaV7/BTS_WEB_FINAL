@@ -26,7 +26,7 @@ BTS_WEB/
 ├── db.py                    ← Conexión a NeonDB
 ├── utils.py                 ← Subida de imágenes a Supabase
 ├── requirements.txt
-├── .env.             ← Variables de entorno
+├── .env             ← Variables de entorno
 │
 ├── models/                  ← Modelos Pydantic + SQLModel
 │   ├── integrante.py        ← Tabla: integrante
