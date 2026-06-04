@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import Optional
+from datetime import timezone, timedelta
 
 from db import create_all_tables, SessionDep
 from utils import subir_imagen
@@ -37,6 +38,7 @@ from operations.operations_votos import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
+COLOMBIA = timezone(timedelta(hours=-5))
 app = FastAPI(
     lifespan=create_all_tables,
     title="BTS WORLD API",
@@ -109,8 +111,14 @@ def pagina_dashboard(request: Request, session: SessionDep,
     integrantes  = ver_integrantes(session)
     albumes      = ver_albumes(session)
     total_votos  = sum(s.total_votos for s in stats)
-    # Mapear integrante_id → nombre para la tabla de votos
+    # Mapear integrante_id, nombre para la tabla de votos
     nombres_mapa = {i.id: i.nombre for i in integrantes}
+    # La BD guarda la fecha en UTC, se pasa a hora de Colombia
+    for v in recientes:
+        fecha = v.fecha
+        if fecha.tzinfo is None:
+            fecha = fecha.replace(tzinfo=timezone.utc)
+        v.fecha = fecha.astimezone(COLOMBIA)
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "stats":                stats,
