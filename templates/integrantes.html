@@ -67,12 +67,6 @@
                                 title="Editar">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <!-- Desactivar (soft delete) -->
-                        <button class="btn btn-sm btn-outline-danger"
-                                onclick="confirmarDesactivar({{ i.id }}, '{{ i.nombre }}')"
-                                title="Desactivar">
-                            <i class="fa-solid fa-user-slash"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -211,29 +205,6 @@
         </div>
     </div>
 </div>
-
-<!--CONFIRMAR DESACTIVAR-->
-<div class="modal fade" id="modalConfirmar" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content bts-modal">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Desactivar a <strong id="nombreConfirmar" class="text-purple"></strong>?</p>
-                <p class="text-muted small">El registro quedará en el historial con estado inactivo.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" onclick="ejecutarDesactivar()">
-                    <i class="fa-solid fa-user-slash me-2"></i>Desactivar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block scripts %}
@@ -299,20 +270,6 @@ async function subirImagen() {
             const err = await r.json();
             alert('Error: ' + (err.detail || 'No se pudo subir la imagen'));
         }
-    } catch(e) { alert('Error de conexión'); }
-}
-
-function confirmarDesactivar(id, nombre) {
-    idActual = id;
-    document.getElementById('nombreConfirmar').textContent = nombre;
-    new bootstrap.Modal(document.getElementById('modalConfirmar')).show();
-}
-
-async function ejecutarDesactivar() {
-    try {
-        const r = await fetch(`/api/integrantes/${idActual}`, { method: 'DELETE' });
-        if (r.ok) { location.reload(); }
-        else { alert('No se pudo desactivar el integrante'); }
     } catch(e) { alert('Error de conexión'); }
 }
 
