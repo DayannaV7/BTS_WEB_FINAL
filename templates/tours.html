@@ -24,7 +24,7 @@
                 <div class="card-body-bts">
                     <h5 class="card-name">{{ t.nombre }}</h5>
                     <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot me-1 text-purple"></i>{{ t.ciudades_visitadas }}</p>
-                    <p class="text-muted small"><i class="fa-solid fa-record-vinyl me-1 text-purple"></i>Álbum ID: {{ t.album_id }}</p>
+                    <p class="text-muted small"><i class="fa-solid fa-record-vinyl me-1 text-purple"></i>{{ nombres_albumes.get(t.album_id, 'Álbum ID: ' ~ t.album_id) }}</p>
                     <div class="card-actions mt-3">
                         <button class="btn btn-sm btn-outline-gold" onclick="editarTour({{ t.id }}, '{{ t.nombre }}', '{{ t.ciudades_visitadas }}', {{ t.anio }})" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button class="btn btn-sm btn-outline-danger" onclick="cancelarTour({{ t.id }}, '{{ t.nombre }}')" title="Cancelar"><i class="fa-solid fa-ban"></i></button>
@@ -42,7 +42,7 @@
     {% endif %}
 </div>
 
-<!--NUEVO TOUR -->
+<!-- MODAL NUEVO TOUR -->
 <div class="modal fade" id="modalNuevoTour" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bts-modal">
@@ -85,7 +85,7 @@
     </div>
 </div>
 
-<!--EDITAR TOUR -->
+<!-- MODAL EDITAR TOUR -->
 <div class="modal fade" id="modalEditarTour" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bts-modal">
