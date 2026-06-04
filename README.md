@@ -57,8 +57,9 @@ BTS_WEB/
 ---
 
 ##  Diagramas 
-![alt text](Diagramas_BTS/Diagrama_Clases_BTS.pdf)
-<embed src="carpeta/Diagrama.pdf" type="application/pdf" width="100%" height="600px" />
+![alt text](Diagramas_BTS/Diagrama_Clases_BTS.png)
+![alt text](Diagramas_BTS/Diagrama_Despliegue_BTS.png)
+![alt text](Diagramas_BTS/Diagrama_endpoints_BTS.png)
 
 ---
 
