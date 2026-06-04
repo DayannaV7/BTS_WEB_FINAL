@@ -1,34 +1,52 @@
 {% extends "base.html" %}
-{% block title %}BTS — Tours{% endblock %}
+{% block title %}BTS — Álbumes{% endblock %}
 {% block content %}
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-            <span class="section-badge">Conciertos</span>
-            <h2 class="section-title mb-0">Tours de <span class="text-purple">BTS</span></h2>
+            <span class="section-badge">Discografía</span>
+            <h2 class="section-title mb-0">Álbumes de <span class="text-purple">BTS</span></h2>
         </div>
-        <button class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#modalNuevoTour">
-            <i class="fa-solid fa-plus me-2"></i>Agregar tour
+        <button class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#modalNuevoAlbum">
+            <i class="fa-solid fa-plus me-2"></i>Agregar álbum
         </button>
     </div>
 
-    {% if tours %}
+    {% if albumes %}
     <div class="row g-4">
-        {% for t in tours %}
-        <div class="col-md-6 col-lg-4">
-            <div class="bts-card h-100 tour-card">
-                <div class="tour-header">
-                    <i class="fa-solid fa-map-location-dot fa-2x text-purple"></i>
-                    <span class="badge bg-purple ms-2">{{ t.anio }}</span>
+        {% for a in albumes %}
+        <div class="col-sm-6 col-lg-4">
+            <div class="bts-card h-100">
+                <div class="card-img-wrapper">
+                    {% if a.imagen_url %}
+                    <img src="{{ a.imagen_url }}" alt="{{ a.nombre }}" class="card-member-img">
+                    {% else %}
+                    <div class="card-img-placeholder"><i class="fa-solid fa-record-vinyl"></i></div>
+                    {% endif %}
                 </div>
                 <div class="card-body-bts">
-                    <h5 class="card-name">{{ t.nombre }}</h5>
-                    <p class="text-muted small mb-1"><i class="fa-solid fa-location-dot me-1 text-purple"></i>{{ t.ciudades_visitadas }}</p>
-                    <p class="text-muted small"><i class="fa-solid fa-record-vinyl me-1 text-purple"></i>{{ nombres_albumes.get(t.album_id, 'Álbum ID: ' ~ t.album_id) }}</p>
-                    <div class="card-actions mt-3">
-                        <button class="btn btn-sm btn-outline-gold" onclick="editarTour({{ t.id }}, '{{ t.nombre }}', '{{ t.ciudades_visitadas }}', {{ t.anio }})" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="cancelarTour({{ t.id }}, '{{ t.nombre }}')" title="Cancelar"><i class="fa-solid fa-ban"></i></button>
+                    <h5 class="card-name">{{ a.nombre }}</h5>
+                    <div class="card-details mt-2">
+                        <span><i class="fa-solid fa-calendar me-1 text-purple"></i>{{ a.anio }}</span>
+                        <span><i class="fa-solid fa-music me-1 text-purple"></i>{{ a.num_canciones }} canciones</span>
                     </div>
+                    <p class="card-desc mt-2">{{ a.descripcion }}</p>
+                    {% if a.link %}
+                    <div class="mt-2">
+                        <a href="{{ a.link }}" target="_blank" class="btn btn-sm btn-outline-purple w-100">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>
+                            Escuchar álbum
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="card-actions mt-3">
+                        <button class="btn btn-sm btn-outline-purple" onclick="abrirImgAlbum({{ a.id }}, '{{ a.nombre }}')" title="Foto"><i class="fa-solid fa-camera"></i></button>
+                        <button class="btn btn-sm btn-outline-gold" onclick="editarAlbum({{ a.id }}, '{{ a.nombre }}', {{ a.num_canciones }}, {{ a.anio }}, '{{ a.descripcion or '' }}', '{{ a.link or '' }}')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarAlbum({{ a.id }}, '{{ a.nombre }}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <a href="/tours?album_id={{ a.id }}" class="btn btn-sm btn-outline-purple w-100 mt-2">
+                        <i class="fa-solid fa-map-location-dot me-1"></i>Ver tours de este álbum
+                    </a>
                 </div>
             </div>
         </div>
@@ -36,44 +54,47 @@
     </div>
     {% else %}
     <div class="empty-state text-center py-5">
-        <i class="fa-solid fa-map-location-dot fa-4x text-purple mb-3 opacity-50"></i>
-        <h4 class="text-muted">No hay tours registrados</h4>
+        <i class="fa-solid fa-record-vinyl fa-4x text-purple mb-3 opacity-50"></i>
+        <h4 class="text-muted">No hay álbumes registrados</h4>
     </div>
     {% endif %}
 </div>
 
-<!-- MODAL NUEVO TOUR -->
-<div class="modal fade" id="modalNuevoTour" tabindex="-1">
+<!-- MODAL NUEVO ÁLBUM -->
+<div class="modal fade" id="modalNuevoAlbum" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bts-modal">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fa-solid fa-map-location-dot me-2 text-purple"></i>Nuevo tour</h5>
+                <h5 class="modal-title"><i class="fa-solid fa-record-vinyl me-2 text-purple"></i>Nuevo álbum</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="/form/tours" method="post">
+            <form action="/form/albumes" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Nombre <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre" class="form-control bts-input" required placeholder="Ej: Love Yourself World Tour">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ciudades visitadas <span class="text-danger">*</span></label>
-                        <textarea name="ciudades_visitadas" class="form-control bts-input" required rows="2" placeholder="Ej: Seúl, Los Ángeles, Londres, París"></textarea>
+                        <input type="text" name="nombre" class="form-control bts-input" required minlength="1" maxlength="128" placeholder="Ej: Map of the Soul: 7">
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-6">
-                            <label class="form-label">Año <span class="text-danger">*</span></label>
-                            <input type="number" name="anio" class="form-control bts-input" required min="1991" max="2029" placeholder="2024">
+                            <label class="form-label">N° Canciones <span class="text-danger">*</span></label>
+                            <input type="number" name="num_canciones" class="form-control bts-input" required min="1" placeholder="Ej: 20">
                         </div>
                         <div class="col-6">
-                            <label class="form-label">Álbum asociado <span class="text-danger">*</span></label>
-                            <select name="album_id" class="form-select bts-input" required>
-                                <option value="">-- Seleccionar --</option>
-                                {% for a in albumes %}
-                                <option value="{{ a.id }}">{{ a.nombre }} ({{ a.anio }})</option>
-                                {% endfor %}
-                            </select>
+                            <label class="form-label">Año <span class="text-danger">*</span></label>
+                            <input type="number" name="anio" class="form-control bts-input" required min="1991" max="2029" placeholder="Ej: 2020">
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="descripcion" class="form-control bts-input" rows="3" maxlength="500"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Link (Spotify / YouTube)</label>
+                        <input type="url" name="link" class="form-control bts-input" placeholder="https://open.spotify.com/album/...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Portada del álbum</label>
+                        <input type="file" name="imagen" class="form-control bts-input" accept="image/jpeg,image/png,image/webp">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -85,22 +106,46 @@
     </div>
 </div>
 
-<!-- MODAL EDITAR TOUR -->
-<div class="modal fade" id="modalEditarTour" tabindex="-1">
+<!-- MODAL EDITAR -->
+<div class="modal fade" id="modalEditarAlbum" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bts-modal">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2 text-gold"></i>Editar tour</h5>
+                <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2 text-gold"></i>Editar álbum</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3"><label class="form-label">Nombre</label><input type="text" id="et-nombre" class="form-control bts-input"></div>
-                <div class="mb-3"><label class="form-label">Ciudades</label><textarea id="et-ciudades" class="form-control bts-input" rows="2"></textarea></div>
-                <div class="mb-3"><label class="form-label">Año</label><input type="number" id="et-anio" class="form-control bts-input" min="1991" max="2029"></div>
+                <div class="mb-3"><label class="form-label">Nombre</label><input type="text" id="ea-nombre" class="form-control bts-input"></div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6"><label class="form-label">N° Canciones</label><input type="number" id="ea-canciones" class="form-control bts-input" min="1"></div>
+                    <div class="col-6"><label class="form-label">Año</label><input type="number" id="ea-anio" class="form-control bts-input" min="1991" max="2029"></div>
+                </div>
+                <div class="mb-3"><label class="form-label">Descripción</label><textarea id="ea-desc" class="form-control bts-input" rows="3"></textarea></div>
+                <div class="mb-3"><label class="form-label">Link (Spotify / YouTube)</label><input type="url" id="ea-link" class="form-control bts-input" placeholder="https://open.spotify.com/album/..."></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-gold" onclick="guardarTour()"><i class="fa-solid fa-floppy-disk me-2"></i>Actualizar</button>
+                <button type="button" class="btn btn-gold" onclick="guardarAlbum()"><i class="fa-solid fa-floppy-disk me-2"></i>Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL IMAGEN ÁLBUM -->
+<div class="modal fade" id="modalImgAlbum" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bts-modal">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-camera me-2 text-purple"></i>Portada</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Álbum: <strong id="nombreImgAlbum" class="text-purple"></strong></p>
+                <input type="file" id="archivoImgAlbum" class="form-control bts-input" accept="image/jpeg,image/png,image/webp">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-purple" onclick="subirImgAlbum()"><i class="fa-solid fa-upload me-2"></i>Subir</button>
             </div>
         </div>
     </div>
@@ -109,30 +154,47 @@
 
 {% block scripts %}
 <script>
-let idTour = null;
-function editarTour(id, nombre, ciudades, anio) {
-    idTour = id;
-    document.getElementById('et-nombre').value   = nombre;
-    document.getElementById('et-ciudades').value = ciudades;
-    document.getElementById('et-anio').value     = anio;
-    new bootstrap.Modal(document.getElementById('modalEditarTour')).show();
+let idAlbum = null;
+function editarAlbum(id, nombre, canciones, anio, desc, link) {
+    idAlbum = id;
+    document.getElementById('ea-nombre').value    = nombre;
+    document.getElementById('ea-canciones').value = canciones;
+    document.getElementById('ea-anio').value      = anio;
+    document.getElementById('ea-desc').value      = desc;
+    document.getElementById('ea-link').value      = link || '';
+    new bootstrap.Modal(document.getElementById('modalEditarAlbum')).show();
 }
-async function guardarTour() {
-    const r = await fetch(`/api/tours/${idTour}`, {
+async function guardarAlbum() {
+    const r = await fetch(`/api/albumes/${idAlbum}`, {
         method: 'PATCH',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
-            nombre: document.getElementById('et-nombre').value,
-            ciudades_visitadas: document.getElementById('et-ciudades').value,
-            anio: parseInt(document.getElementById('et-anio').value)
+            nombre: document.getElementById('ea-nombre').value,
+            num_canciones: parseInt(document.getElementById('ea-canciones').value),
+            anio: parseInt(document.getElementById('ea-anio').value),
+            descripcion: document.getElementById('ea-desc').value || null,
+            link: document.getElementById('ea-link').value || null
         })
     });
     if (r.ok) location.reload(); else alert('Error al actualizar');
 }
-async function cancelarTour(id, nombre) {
-    if (!confirm(`¿Cancelar el tour "${nombre}"?`)) return;
-    const r = await fetch(`/api/tours/${id}`, { method: 'DELETE' });
-    if (r.ok) location.reload(); else alert('No se pudo cancelar');
+function abrirImgAlbum(id, nombre) {
+    idAlbum = id;
+    document.getElementById('nombreImgAlbum').textContent = nombre;
+    new bootstrap.Modal(document.getElementById('modalImgAlbum')).show();
+}
+async function subirImgAlbum() {
+    const archivo = document.getElementById('archivoImgAlbum').files[0];
+    if (!archivo) { alert('Selecciona una imagen'); return; }
+    const fd = new FormData();
+    fd.append('imagen', archivo);
+    const r = await fetch(`/api/albumes/${idAlbum}/imagen`, { method: 'POST', body: fd });
+    if (r.ok) location.reload(); else alert('Error al subir imagen');
+}
+async function eliminarAlbum(id, nombre) {
+    if (!confirm(`¿Desactivar el álbum "${nombre}"?`)) return;
+    const r = await fetch(`/api/albumes/${id}`, { method: 'DELETE' });
+    if (r.ok) location.reload(); else alert('No se pudo desactivar');
 }
 </script>
 {% endblock %}
