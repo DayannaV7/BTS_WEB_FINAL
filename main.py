@@ -270,17 +270,6 @@ def api_editar_integrante(id: int, datos: IntegranteUpdate, session: SessionDep)
         raise HTTPException(404, f"Integrante con ID {id} no encontrado o inactivo")
     return actualizado
 
-
-@app.delete("/api/integrantes/{id}", tags=["API — Integrantes"])
-def api_desactivar_integrante(id: int, session: SessionDep):
-    i = buscar_integrante_id(id, session)
-    if not i:
-        raise HTTPException(404, f"Integrante con ID {id} no encontrado")
-    if i.estado == "inactivo":
-        raise HTTPException(409, f"El integrante {id} ya está inactivo")
-    return desactivar_integrante(id, session)
-
-
 @app.post("/api/integrantes/{id}/imagen", tags=["API — Integrantes"])
 async def api_imagen_integrante(id: int, session: SessionDep,
                                 imagen: UploadFile = File(...)):
