@@ -6,17 +6,17 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import Optional
-from datetime import timedelta
+
 from db import create_all_tables, SessionDep
 from utils import subir_imagen
 
-# Modelos
+# ── Modelos ──────────────────────────────────────────────────────────────────
 from models.integrante import Integrante, IntegranteBase, IntegranteUpdate
 from models.album      import Album, AlbumBase, AlbumUpdate
 from models.tour       import Tour, TourBase, TourUpdate
 from models.voto       import VotoFan, VotoBase
 
-#Operaciones
+# ── Operaciones ───────────────────────────────────────────────────────────────
 from operations.operations_integrantes import (
     crear_integrante, ver_integrantes, buscar_por_id as buscar_integrante_id,
     buscar_por_nombre as buscar_integrante_nombre,
@@ -36,6 +36,7 @@ from operations.operations_votos import (
     crear_voto, ver_votos, votos_recientes, estadisticas_popularidad
 )
 
+# ═══════════════════════════════════════════════════════════════════════════════
 app = FastAPI(
     lifespan=create_all_tables,
     title="BTS WORLD API",
@@ -46,8 +47,10 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-#RUTAS HTML
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  RUTAS HTML
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/", response_class=HTMLResponse, tags=["HTML"])
 def inicio(request: Request):
@@ -87,12 +90,14 @@ def pagina_tours(request: Request, session: SessionDep,
     else:
         tours = ver_tours(session)
     albumes = ver_albumes(session)
+    nombres_albumes = {a.id: a.nombre for a in albumes}
     return templates.TemplateResponse("tours.html", {
-        "request": request,
-        "tours": tours,
-        "albumes": albumes,
-        "mensaje": mensaje,
-        "tipo_mensaje": tipo_mensaje
+        "request":        request,
+        "tours":          tours,
+        "albumes":        albumes,
+        "nombres_albumes": nombres_albumes,
+        "mensaje":        mensaje,
+        "tipo_mensaje":   tipo_mensaje
     })
 
 
@@ -112,7 +117,6 @@ def pagina_dashboard(request: Request, session: SessionDep,
         "votos_recientes":      recientes,
         "integrantes":          integrantes,
         "albumes":              albumes,
-        "timedelta": timedelta(hours=-5),
         "total_votos":          total_votos,
         "total_albumes":        len(albumes),
         "nombres_chart":        [s.nombre_integrante for s in stats],
@@ -139,8 +143,9 @@ def buscar_global(request: Request, session: SessionDep, q: str = ""):
     })
 
 
-
-#FORMULARIOS HTML (POST redirect con mensaje)
+# ══════════════════════════════════════════════════════════════════════════════
+#  FORMULARIOS HTML (POST → redirect con mensaje)
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/form/integrantes", tags=["Formularios"])
 async def form_crear_integrante(
@@ -168,10 +173,12 @@ async def form_crear_album(
     num_canciones: int   = Form(...),
     anio:          int   = Form(...),
     descripcion:   str   = Form(""),
+    link:          str   = Form(""),
     imagen:        UploadFile = File(None)
 ):
     base = AlbumBase(nombre=nombre, num_canciones=num_canciones,
-                     anio=anio, descripcion=descripcion or None)
+                     anio=anio, descripcion=descripcion or None,
+                     link=link or None)
     nuevo = crear_album(base, session)
     if imagen and imagen.filename:
         url = subir_imagen(imagen, carpeta="albumes")
@@ -223,8 +230,9 @@ async def form_votar(
     )
 
 
-
-#API JSON INTEGRANTES
+# ══════════════════════════════════════════════════════════════════════════════
+#  API JSON — INTEGRANTES (criterio 2: contenido negociado)
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/api/integrantes", tags=["API — Integrantes"])
 def api_ver_integrantes(request: Request, session: SessionDep, q: Optional[str] = None):
@@ -275,8 +283,9 @@ async def api_imagen_integrante(id: int, session: SessionDep,
     return actualizar_img_integrante(id, url, session)
 
 
-
-#API JSON ÁLBUMES
+# ══════════════════════════════════════════════════════════════════════════════
+#  API JSON — ÁLBUMES
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/api/albumes", tags=["API — Álbumes"])
 def api_ver_albumes(session: SessionDep):
@@ -322,9 +331,9 @@ async def api_imagen_album(id: int, session: SessionDep,
     return actualizar_img_album(id, url, session)
 
 
-
-#API JSON TOURS
-
+# ══════════════════════════════════════════════════════════════════════════════
+#  API JSON — TOURS
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/api/tours", tags=["API — Tours"])
 def api_ver_tours(session: SessionDep, ciudad: Optional[str] = None):
@@ -357,9 +366,9 @@ def api_cancelar_tour(id: int, session: SessionDep):
     return cancelar_tour(id, session)
 
 
-
-#API JSON VOTOS y DASHBOARD
-
+# ══════════════════════════════════════════════════════════════════════════════
+#  API JSON — VOTOS / DASHBOARD
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/api/votos", tags=["API — Votos"])
 def api_ver_votos(session: SessionDep):
@@ -380,9 +389,9 @@ def api_stats(session: SessionDep):
     return estadisticas_popularidad(session)
 
 
-
-#  SEED Poblar BD con datos reales de BTS
-
+# ══════════════════════════════════════════════════════════════════════════════
+#  SEED — Poblar BD con datos reales de BTS
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/seed", tags=["Utilidades"], summary="Poblar BD con datos de BTS")
 def seed_database(session: SessionDep):
@@ -445,5 +454,5 @@ def seed_database(session: SessionDep):
         session.add(Tour(**d))
     session.commit()
 
-    return {"mensaje": " Base de datos poblada con datos reales de BTS",
+    return {"mensaje": "✅ Base de datos poblada con datos reales de BTS",
             "integrantes": 7, "albumes": 5, "tours": 3}
