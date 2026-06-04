@@ -4,10 +4,12 @@ from typing import Optional
 
 
 class AlbumBase(SQLModel):
-    nombre:       str = Field(min_length=1, max_length=128)
+    nombre:        str = Field(min_length=1, max_length=128)
     num_canciones: int = Field(gt=0)
-    anio:         int = Field(gt=1990, lt=2030, description="Año de lanzamiento")
-    descripcion:  Optional[str] = Field(default=None, max_length=500)
+    anio:          int = Field(gt=1990, lt=2030, description="Año de lanzamiento")
+    descripcion:   Optional[str] = Field(default=None, max_length=500)
+    link:          Optional[str] = Field(default=None, max_length=300,
+                                         description="Link de Spotify o YouTube del álbum")
 
 
 class Album(AlbumBase, table=True):
@@ -24,6 +26,7 @@ class AlbumRead(BaseModel):
     anio:          int
     descripcion:   str | None
     imagen_url:    str | None
+    link:          str | None
     estado:        str
 
 
@@ -32,3 +35,4 @@ class AlbumUpdate(SQLModel):
     num_canciones: int | None = Field(default=None, gt=0)
     anio:          int | None = Field(default=None, gt=1990, lt=2030)
     descripcion:   str | None = Field(default=None, max_length=500)
+    link:          str | None = Field(default=None, max_length=300)
